@@ -17,38 +17,41 @@ var state = {
   transactions : []
 };
 
-while(state.capital > 0 && state.capital <= remainingCost(input.options)) {
-  state.transactions.push(purchaseBulk(state, input.options));
-  var remaining = remainingCost(input.options);
-  if (remaining > 0) {
-    if (state.capital + state.amount * input.market > remaining) {
-      // Sell just enough to be able to purchase remaining options
-      var amt = Math.ceil((remaining - state.capital) / input.market);
-      var transaction = {
-        type : 'SELL',
-        amount : amt,
-        price : input.market
-      };
-      state.capital += amt * input.market;
-      state.amount -= amt;
-      state.transactions.push(transaction);
-    } else {
-      // Sell all options
-      var transaction = {
-        type : 'SELL',
-        amount : state.amount,
-        price : input.market
-      };
-      state.capital += state.amount * input.market;
-      state.amount = 0;
-      state.transactions.push(transaction);
+var minPrice = input.options[0].price;
+if (minPrice != null && state.capital > minPrice) {
+  while(state.capital > 0 && state.capital <= remainingCost(input.options)) {
+    state.transactions.push(purchaseBulk(state, input.options));
+    var remaining = remainingCost(input.options);
+    if (remaining > 0) {
+      if (state.capital + state.amount * input.market > remaining) {
+        // Sell just enough to be able to purchase remaining options
+        var amt = Math.ceil((remaining - state.capital) / input.market);
+        var transaction = {
+          type : 'SELL',
+          amount : amt,
+          price : input.market
+        };
+        state.capital += amt * input.market;
+        state.amount -= amt;
+        state.transactions.push(transaction);
+      } else {
+        // Sell all options
+        var transaction = {
+          type : 'SELL',
+          amount : state.amount,
+          price : input.market
+        };
+        state.capital += state.amount * input.market;
+        state.amount = 0;
+        state.transactions.push(transaction);
+      }
     }
   }
-}
 
-// Purchase remaining options with capital
-while(remainingCost(input.options) > 0) {
-  state.transactions.push(purchaseBulk(state, input.options));
+  // Purchase remaining options with capital
+  while(remainingCost(input.options) > 0) {
+    state.transactions.push(purchaseBulk(state, input.options));
+  }
 }
 
 console.log(state);
