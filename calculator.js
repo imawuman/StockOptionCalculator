@@ -1,3 +1,4 @@
+// TODO: create input object using input from command line
 var input = {
   market : 4,
   capital : 10,
@@ -9,6 +10,7 @@ var input = {
     price : 2
   }]
 };
+
 input.options.sort(compareOptions);
 
 var state = {
@@ -17,8 +19,14 @@ var state = {
   transactions : []
 };
 
-var minPrice = input.options[0].price;
-if (minPrice != null && state.capital > minPrice) {
+var minPrice = Number.MAX_VALUE;
+for (var i=0; i<input.options.length; i++) {
+  if (input.options[i].price < minPrice) {
+    minPrice = input.options[i].price;
+  }
+}
+
+if (state.capital > minPrice) {
   while(state.capital > 0 && state.capital <= remainingCost(input.options)) {
     state.transactions.push(purchaseBulk(state, input.options));
     var remaining = remainingCost(input.options);
@@ -54,6 +62,7 @@ if (minPrice != null && state.capital > minPrice) {
   }
 }
 
+// TODO: pretty print the output
 console.log(state);
 
 // Purchase as many cheap options in bulk as we can and return the transaction
